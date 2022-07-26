@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {
   Container,
   InputArea,
@@ -9,6 +10,8 @@ import {
   SignMessageButtonText,
   SignMessageButtonTextBold,
 } from './styles';
+
+import {UserContext} from '../../contexts/UserContext';
 
 import Api from '../../api';
 
@@ -20,7 +23,9 @@ import PersonIcon from '../../assets/person.svg';
 import SignInput from '../../components/SignInput';
 
 export default () => {
+  const {dispatch: userDispatch} = useContext(UserContext);
   const navigation = useNavigation();
+
   const [nameField, setNameField] = useState('');
   const [emailField, setEmailField] = useState('');
   const [passwordField, setPasswordField] = useState('');
@@ -30,12 +35,23 @@ export default () => {
       let res = await Api.singUp(nameField, emailField, passwordField);
 
       if (res.token) {
-        alert('DEU CERTO');
+        await AsyncStorage.setItem('token', res.token);
+
+        userDispatch({
+          type: 'setAvatar',
+          payload: {
+            avatar: res.data.avatar,
+          },
+        });
+
+        navigation.reset({
+          routes: [{name: 'MainTab'}],
+        });
       } else {
         alert('Erro: ' + res.error);
       }
     } else {
-      alert('Preencha os campos');
+      alert('Preencha os Campos');
     }
   };
 
