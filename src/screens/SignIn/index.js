@@ -1,5 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
+
+import Api from '../../api';
+
+import {UserContext} from '../../contexts/UserContext';
+
 import {
   Container,
   InputArea,
@@ -9,9 +15,6 @@ import {
   SignMessageButtonText,
   SignMessageButtonTextBold,
 } from './styles';
-
-import Api from '../../api';
-
 import SignInput from '../../components/SignInput';
 
 import PetShop from '../../assets/house-pet.svg';
@@ -19,20 +22,29 @@ import EmailIcon from '../../assets/email.svg';
 import LockIcon from '../../assets/lock.svg';
 
 export default () => {
+  const {dispatch: userDispatch} = useContext(UserContext);
   const navigation = useNavigation();
+
   const [emailField, setEmailField] = useState('');
   const [passwordField, setPasswordField] = useState('');
-
-// suport@b7web.com.br
-// 1234
 
   const handleSignClick = async () => {
     if (emailField != '' && passwordField != '') {
       let json = await Api.signIn(emailField, passwordField);
-      console.log(json);
-      
+
       if (json.token) {
-        alert('DEU CERTO');
+        await AsyncStorage.setItem('token', json.token);
+
+        userDispatch({
+          type: 'setAvatar',
+          payload: {
+            avatar: json.data.avatar,
+          },
+        });
+
+        navigation.reset({
+          routes: [{name: 'MainTab'}],
+        });
       } else {
         alert('E-mail e/ou senha errados!');
       }
