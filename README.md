@@ -5,7 +5,7 @@
 
 ## Overview :book:
 
-App para PetShop com React-Native CLI.
+App para PetShop com React-Native CLI utilizando Context-Api para gerenciamento de estado. Com opções de buscar veterinário por geo-localização e agendamento.
    
 
 ---------------------------
