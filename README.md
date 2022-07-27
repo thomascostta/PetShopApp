@@ -3,10 +3,18 @@
 </h1>
 
 
-## Overview :book:
+# Overview :book:
 
-App para PetShop com React-Native CLI utilizando Context-Api para gerenciamento de estado. Com opções de buscar veterinário por geo-localização e agendamento.
-   
+App para PetShop com funções de agendamento com veterinário utilizando geo-localização. App utilizando React-Native CLI com gerenciamento de estado pelo Context.
+
+Principais bibliotecas utilizadas:
+
+- async-storage
+- react-native-community/geolocation
+- react-native-permissions
+- react-native-community/masked-view
+- react-navigation
+- styled-components
 
 ---------------------------
 
