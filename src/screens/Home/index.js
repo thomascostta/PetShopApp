@@ -33,10 +33,6 @@ export default () => {
   const [list, setList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    getBarbers();
-  }, []);
-
   const handleLocationFinder = async () => {
     setCoords(null);
     let result = await request(
@@ -87,6 +83,10 @@ export default () => {
     setRefreshing(false);
     getBarbers();
   };
+
+  useEffect(() => {
+    getBarbers();
+  }, []);
 
   const handleLocationSearch = () => {
     setCoords({});
