@@ -57,3 +57,9 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+
+#Jason-server
+db.json
+
+#dotenv
+.env
