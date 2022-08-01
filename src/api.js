@@ -65,4 +65,14 @@ export default {
     const json = await req.json();
     return json;
   },
+
+  getBarber: async (id) => {
+    const token = await AsyncStorage.getItem('token');
+
+    const req = await fetch(`${BASE_API}/barber/${id}?token=${token}`);
+    const json = await req.json();
+    console.log('json');
+    
+    return json;
+  },
 };
