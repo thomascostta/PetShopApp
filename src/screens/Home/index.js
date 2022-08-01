@@ -27,8 +27,8 @@ import MyLocationIcon from '../../assets/my_location.svg';
 export default () => {
   const navigation = useNavigation();
 
-  const [locationText, setLocationText] = useState('');
   const [coords, setCoords] = useState(null);
+  const [locationText, setLocationText] = useState('');
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
