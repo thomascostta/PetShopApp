@@ -3,6 +3,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import Swiper from 'react-native-swiper';
 
 import Stars from '../../components/Stars';
+import BarberModal from '../../components/BarberModal';
 
 import FavoriteFullIcon from '../../assets/favorite_full.svg';
 import FavoriteIcon from '../../assets/favorite.svg';
@@ -56,12 +57,14 @@ export default () => {
   });
   const [loading, setLoading] = useState(false);
   const [favorited, setFavorited] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const getBarberInfo = async () => {
       setLoading(true);
 
-      let json = await Api.getBarber(userInfo.id);      
+      let json = await Api.getBarber(userInfo.id);
 
       if (json.error === '') {
         setUserInfo(json.data);
@@ -82,6 +85,11 @@ export default () => {
   const handleFavoriteClick = () => {
     setFavorited(!favorited);
     api.setFavorite(userInfo.id);
+  };
+
+  const handleServiceChoose = (index) => {
+    setSelectedService(index);
+    setShowModal(true);
   };
 
   return (
@@ -130,7 +138,8 @@ export default () => {
                     <ServiceName>{item.name}</ServiceName>
                     <ServicePrice>R$ {item.price}</ServicePrice>
                   </ServiceInfo>
-                  <ServiceChooseButton>
+                  <ServiceChooseButton
+                    onPress={() => handleServiceChoose(index)}>
                     <ServiceChooseBtnText>Agendar</ServiceChooseBtnText>
                   </ServiceChooseButton>
                 </ServiceItem>
@@ -168,6 +177,13 @@ export default () => {
       <BackButton onPress={handleBackButton}>
         <BackIcon width="44" height="44" fill="#ffffff" />
       </BackButton>
+
+      <BarberModal
+        show={showModal}
+        setShow={setShowModal}
+        user={userInfo}
+        service={selectedService}
+      />
     </Container>
   );
 };
