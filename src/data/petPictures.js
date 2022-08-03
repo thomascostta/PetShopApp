@@ -11,8 +11,4 @@ export const petPictures = [
     id: '3',
     image: require('../assets/pet3.png'),
   },
-  {
-    id: '4',
-    image: require('../assets/pet4.png'),
-  },
 ];
