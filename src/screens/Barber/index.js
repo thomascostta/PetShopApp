@@ -4,29 +4,45 @@ import Swiper from 'react-native-swiper';
 
 import Stars from '../../components/Stars';
 
+import FavoriteFullIcon from '../../assets/favorite_full.svg';
 import FavoriteIcon from '../../assets/favorite.svg';
 import BackIcon from '../../assets/back.svg';
+import NavPrevIcon from '../../assets/nav_prev.svg';
+import NavNextIcon from '../../assets/nav_next.svg';
 
 import {
+  SwipeDot,
   UserInfo,
   Scroller,
-  SwipeDot,
   PageBody,
   Container,
   UserAvatar,
   BackButton,
   SwiperItem,
+  LoadingIcon,
+  ServiceItem,
+  ServiceName,
+  ServiceInfo,
   ServiceArea,
   SwiperImage,
   UserInfoArea,
+  ServicePrice,
   UserInfoName,
   UserFavButton,
+  ServicesTitle,
   SwipeDotActive,
   TestimonialArea,
+  TestimonialItem,
+  TestimonialInfo,
+  TestimonialName,
+  TestimonialBody,
+  ServiceChooseButton,
+  ServiceChooseBtnText,
 } from './styles';
 
 import Api from '../../api';
 import {petPictures} from '../../data/petPictures';
+import api from '../../api';
 
 export default () => {
   const navigation = useNavigation();
@@ -39,15 +55,17 @@ export default () => {
     stars: route.params.stars,
   });
   const [loading, setLoading] = useState(false);
+  const [favorited, setFavorited] = useState(false);
 
   useEffect(() => {
     const getBarberInfo = async () => {
       setLoading(true);
 
-      let json = await Api.getBarber(userInfo.id);
+      let json = await Api.getBarber(userInfo.id);      
 
       if (json.error === '') {
         setUserInfo(json.data);
+        setFavorited(json.data.favorited);
       } else {
         alert('Erro: ' + json.error);
       }
@@ -59,6 +77,11 @@ export default () => {
 
   const handleBackButton = () => {
     navigation.goBack();
+  };
+
+  const handleFavoriteClick = () => {
+    setFavorited(!favorited);
+    api.setFavorite(userInfo.id);
   };
 
   return (
@@ -88,16 +111,58 @@ export default () => {
               <UserInfoName>{userInfo.name}</UserInfoName>
               <Stars stars={userInfo.stars} showNumber={true} />
             </UserInfo>
-            <UserFavButton>
-              <FavoriteIcon width="24" height="24" fill="#ff0000" />
+            <UserFavButton onPress={handleFavoriteClick}>
+              {favorited ? (
+                <FavoriteFullIcon width="24" height="24" fill="#ff0000" />
+              ) : (
+                <FavoriteIcon width="24" height="24" fill="#ff0000" />
+              )}
             </UserFavButton>
           </UserInfoArea>
-          <ServiceArea>
 
-          </ServiceArea>
-          <TestimonialArea>
-            
-          </TestimonialArea>
+          {loading && <LoadingIcon size="large" color="#000000" />}
+          {userInfo.services && (
+            <ServiceArea>
+              <ServicesTitle>Lista de serviços</ServicesTitle>
+              {userInfo.services.map((item, index) => (
+                <ServiceItem key={index}>
+                  <ServiceInfo>
+                    <ServiceName>{item.name}</ServiceName>
+                    <ServicePrice>R$ {item.price}</ServicePrice>
+                  </ServiceInfo>
+                  <ServiceChooseButton>
+                    <ServiceChooseBtnText>Agendar</ServiceChooseBtnText>
+                  </ServiceChooseButton>
+                </ServiceItem>
+              ))}
+            </ServiceArea>
+          )}
+
+          {/* Waiting for backend regularization */}
+          {/* {userInfo && userInfo.testimonials.length > 0 && (
+            <TestimonialArea>
+              <Swiper
+                style={{height: 110}}
+                showsPagination={false}
+                showsButtons
+                prevButton={
+                  <NavPrevIcon width="35" height="35" fill="#000000" />
+                }
+                nextButton={
+                  <NavNextIcon width="35" height="35" fill="#000000" />
+                }>
+                {userInfo.testimonials.map((item, index) => (
+                  <TestimonialItem key={index}>
+                    <TestimonialInfo>
+                      <TestimonialName>{item.name}</TestimonialName>
+                      <Stars stars={item.rate} showNumber={false} />
+                    </TestimonialInfo>
+                    <TestimonialBody>{item.body}</TestimonialBody>
+                  </TestimonialItem>
+                ))}
+              </Swiper>
+            </TestimonialArea>
+          )}  */}
         </PageBody>
       </Scroller>
       <BackButton onPress={handleBackButton}>
