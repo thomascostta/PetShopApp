@@ -5,16 +5,7 @@
 
 # Overview :book:
 
-App para PetShop com funções de agendamento com veterinário utilizando geo-localização. App utilizando React-Native CLI com gerenciamento de estado pelo Context.
-
-Principais bibliotecas utilizadas:
-
-- async-storage
-- react-native-community/geolocation
-- react-native-permissions
-- react-native-community/masked-view
-- react-navigation
-- styled-components
+App para PetShop  desenvolvido com React Native, utilizando o gerenciamento de estado pelo hook Context, estilização com styled-components e sincronização no back-end com API Rest. Com as funções de criação de usuário, login e logout, agendamento por dia e horário e outras funções.
 
 ---------------------------
 
