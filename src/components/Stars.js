@@ -1,44 +1,43 @@
 import React from 'react';
-import styled from 'styled-components/native';
+import styled from 'styled-components';
 
-import StarFul from '../assets/star.svg';
-import StarHalf from '../assets/star_half.svg';
-import StarEmpty from '../assets/star_empty.svg';
+import StarFull from '../assets/star';
+import StarHalf from '../assets/star_half';
+import StarEmpty from '../assets/star_empty';
 
 const StarArea = styled.View`
   flex-direction: row;
 `;
-const StartView = styled.View``;
-
+const StarView = styled.View``;
 const StarText = styled.Text`
-  font-size: 12px;
-  font-weight: bold;
-  margin-left: 5px;
-  color: #737373;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 5px;
+    color: #737373
 `;
 
-export default ({stars, showNumber}) => {
-  let star = [0, 0, 0, 0, 0];
-  let floor = Math.floor(stars);
-  let left = stars - floor;
+export default ({note, showN}) => {
+  let s = [0, 0, 0, 0, 0];
+  let floor = Math.floor(note)
+  let left = note - floor;
 
-  for (var i = 0; i < floor; i++) {
-    star[i] = 2;
+  for(var i=0;i<floor;i++){
+      s[i] = 2;
   }
-  if (left > 0) {
-    star[i] = i;
+  if(left > 0){
+      s[i] = 1;
   }
 
   return (
     <StarArea>
-      {star.map((item, index) => (
-        <StartView key={index}>
-          {item === 0 && <StarEmpty width="18" height="18" fill="#ff9200" />}
-          {item === 1 && <StarHalf width="18" height="18" fill="#ff9200" />}
-          {item === 2 && <StarFul width="18" height="18" fill="#ff9200" />}
-        </StartView>
+      {s.map((i, key) => (
+        <StarView key={key}>
+          {i === 0 && <StarEmpty width="18" height="18" fill="#FF9200" />}
+          {i === 1 && <StarHalf width="18" height="18" fill="#FF9200" />}
+          {i === 2 && <StarFull width="18" height="18" fill="#FF9200" />}
+        </StarView>
       ))}
-      {showNumber && <StarText>{stars}</StarText>}
+      {showN && <StarText>{note}</StarText>}
     </StarArea>
   );
 };
