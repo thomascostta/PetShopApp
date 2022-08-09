@@ -33,6 +33,15 @@ Run the application (iOS)
 
 ---------------------------
 
+
+### Credits 🤝
+
+
+Thanks to [Bonieky Lacerda](https://github.com/bonieky/ "Bonieky Lacerda") for your mentorship.
+  
+---------------------------
+
+
 Edição realizada com ❤️ por Thomas Costa 👋🏽 Entre em contato!
 
 [![Linkedin Badge](https://img.shields.io/badge/-Thomas-blue?style=flat-square&logo=Linkedin&logoColor=white&link=https://www.linkedin.com/in/tgmarinho/)](https://www.linkedin.com/in/thomasjeffcosta/) 
