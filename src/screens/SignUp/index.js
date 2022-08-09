@@ -1,102 +1,108 @@
 import React, {useState, useContext} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {
-  Container,
-  InputArea,
-  CustomButton,
-  CustomButtomText,
-  SignMessageButton,
-  SignMessageButtonText,
-  SignMessageButtonTextBold,
-} from './styles';
 
 import {UserContext} from '../../contexts/UserContext';
 
-import Api from '../../api';
+import { 
+    Container,
+    InputArea,
+    SignUpButton,
+    SignUpButtonText,
+    SignMessageButton,
+    SignMessageButtonText,
+    SignMessageButtonTextBold
+} from './style';
 
-import PetShop from '../../assets/house-pet.svg';
+import Api from '../../Api';
+import SignInput from '../../components/SignInput';
+import Logo from '../../assets/house-pet.svg'
 import EmailIcon from '../../assets/email.svg';
 import LockIcon from '../../assets/lock.svg';
-import PersonIcon from '../../assets/person.svg';
+import PersonIcon from '../../assets/person.svg'
 
-import SignInput from '../../components/SignInput';
 
 export default () => {
-  const {dispatch: userDispatch} = useContext(UserContext);
-  const navigation = useNavigation();
 
-  const [nameField, setNameField] = useState('');
-  const [emailField, setEmailField] = useState('');
-  const [passwordField, setPasswordField] = useState('');
+    const {dispatch: userDispatch} = useContext(UserContext);
 
-  const handleSignClick = async () => {
-    if (nameField != '' && emailField != '' && passwordField != '') {
-      let res = await Api.singUp(nameField, emailField, passwordField);
+    const navigation = useNavigation();
 
-      if (res.token) {
-        await AsyncStorage.setItem('token', res.token);
+    const [nameField, setNameField] = useState('');
+    const [emailField, setEmailField] = useState('');
+    const [passwordField, setPasswordField] = useState('');
 
-        userDispatch({
-          type: 'setAvatar',
-          payload: {
-            avatar: res.data.avatar,
-          },
-        });
+    const handleSignClick = async () => {
+        if(nameField != '' && emailField != '' && passwordField != ''){
+            let res = await Api.signUp(nameField, emailField, passwordField);
 
-        navigation.reset({
-          routes: [{name: 'MainTab'}],
-        });
-      } else {
-        alert('Erro: ' + res.error);
-      }
-    } else {
-      alert('Preencha os Campos');
+            if(res.token){
+                await AsyncStorage.setItem('token', res.token); // 1° Passo:Salva no AsyncStorage
+
+                userDispatch({      // 2° Passo: Salva no Context.
+                    type:'setAvatar',
+                    payload:{
+                        name: res.data.name,
+                        avatar: res.data.avatar,
+                        email: res.data.email
+                    }
+                });
+                
+                navigation.reset({      // 3° Passo: Envia o usuário para MainTab.
+                    routes:[{name:'MainTab'}]
+                });
+
+            }else{
+                alert("Oops: " + res.error);
+            }
+        }else{
+            alert("Por favor, preencha os campos!")
+        }
     }
-  };
 
-  const handleMessageButtonClick = () => {
-    navigation.reset({
-      routes: [{name: 'SignIn'}],
-    });
-  };
+    const handleMessageButtonClick = () => {
+        navigation.reset({
+            routes:[{name: 'SignIn'}]
+        });
+    }
 
-  return (
-    <Container>
-      <PetShop width="100%" height="160" />
+    return (
+        <Container>
+            <Logo width="100%" height="160" />
+            <InputArea>
 
-      <InputArea>
-        <SignInput
-          IconSvg={PersonIcon}
-          placeholder="Digite seu nome"
-          value={nameField}
-          onChangeText={(text) => setNameField(text)}
-        />
+                <SignInput 
+                    Icone={PersonIcon}
+                    placeholder="Digite seu nome"
+                    value={nameField}
+                    onChangeText={t => setNameField(t)}
+                     />
+                     
+                <SignInput 
+                    Icone={EmailIcon}
+                    placeholder="Digite seu email"
+                    value={emailField}
+                    onChangeText={t=>setEmailField(t)}
+                     />
 
-        <SignInput
-          IconSvg={EmailIcon}
-          placeholder="Digite seu e-mail"
-          value={emailField}
-          onChangeText={(text) => setEmailField(text)}
-        />
+                <SignInput 
+                    Icone={LockIcon}
+                    placeholder="Digite sua senha"
+                    value={passwordField}
+                    onChangeText={t=>setPasswordField(t)}
+                    pass={true}
+                    />
 
-        <SignInput
-          IconSvg={LockIcon}
-          placeholder="Digite sua senha"
-          email={passwordField}
-          onChangeText={(text) => setPasswordField(text)}
-          password={true}
-        />
+                <SignUpButton onPress={handleSignClick}>
+                    <SignUpButtonText>CADASTRAR</SignUpButtonText>
+                </SignUpButton>
+            </InputArea>
 
-        <CustomButton onPress={handleSignClick}>
-          <CustomButtomText>CADASTRAR</CustomButtomText>
-        </CustomButton>
-      </InputArea>
+            <SignMessageButton onPress={handleMessageButtonClick} >
+                <SignMessageButtonText>Já possui uma conta?</SignMessageButtonText>
+                <SignMessageButtonTextBold>Faça login</SignMessageButtonTextBold>
+            </SignMessageButton>
 
-      <SignMessageButton onPress={handleMessageButtonClick}>
-        <SignMessageButtonText>Já possui uma conta?</SignMessageButtonText>
-        <SignMessageButtonTextBold> Faça Login</SignMessageButtonTextBold>
-      </SignMessageButton>
-    </Container>
-  );
-};
+        </Container>
+    );
+}

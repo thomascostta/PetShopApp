@@ -2,94 +2,92 @@ import React, {useState, useContext} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import Api from '../../api';
-
 import {UserContext} from '../../contexts/UserContext';
+import { 
+    Container,
+    InputArea,
+    LoginButton,
+    LoginButtonText,
+    SignMessageButton,
+    SignMessageButtonText,
+    SignMessageButtonTextBold
+} from './style';
 
-import {
-  Container,
-  InputArea,
-  CustomButton,
-  CustomButtomText,
-  SignMessageButton,
-  SignMessageButtonText,
-  SignMessageButtonTextBold,
-} from './styles';
+import Api from '../../Api';
 import SignInput from '../../components/SignInput';
-
-import PetShop from '../../assets/house-pet.svg';
+import Logo from '../../assets/house-pet.svg'
 import EmailIcon from '../../assets/email.svg';
 import LockIcon from '../../assets/lock.svg';
 
+
 export default () => {
-  const {dispatch: userDispatch} = useContext(UserContext);
-  const navigation = useNavigation();
+    const {dispatch: userDispatch} = useContext(UserContext);
+    const navigation = useNavigation();
+    const [emailField, setEmailField] = useState('');
+    const [passwordField, setPasswordField] = useState('');
 
-  const [emailField, setEmailField] = useState('');
-  const [passwordField, setPasswordField] = useState('');
+    const handleSignClick = async () => {
+       if(emailField != '' && passwordField != ''){ // Verifica se campos estão preenchidos.
+           let res = await Api.signIn(emailField, passwordField);
 
-  const handleSignClick = async () => {
-    if (emailField != '' && passwordField != '') {
-      let json = await Api.signIn(emailField, passwordField);
+           if(res.token){
+               await AsyncStorage.setItem('token', res.token); // 1° Passo:Salva no AsyncStorage
 
-      if (json.token) {
-        await AsyncStorage.setItem('token', json.token);
+               userDispatch({      // 2° Passo: Salva no Context.
+                   type:'setAvatar',
+                   payload:{
+                       name: res.data.name,
+                       avatar: res.data.avatar,
+                       email: res.data.email
+                   }
+               });
+               console.log(res)
 
-        userDispatch({
-          type: 'setAvatar',
-          payload: {
-            avatar: json.data.avatar,
-          },
-        });
+               navigation.reset({      // 3° Passo: Envia o usuário para MainTab.
+                   routes:[{name:'MainTab'}]
+               });
 
-        navigation.reset({
-          routes: [{name: 'MainTab'}],
-        });
-      } else {
-        alert('E-mail e/ou senha errados!');
-      }
-    } else {
-      alert('Preencha os Campos');
+           }else{
+               alert("E-mail ou senha não encontrado! " + ":(")
+           }
+    }else{
+        alert("Por favor, preencha os campos!")
     }
-  };
+}
 
-  const handleMessageButtonClick = () => {
-    navigation.reset({
-      routes: [{name: 'SignUp'}],
-    });
-  };
+    const handleMessageButtonClick = () => {
+        navigation.reset({
+            routes:[{name: 'SignUp'}]
+        });
+    }
 
-  return (
-    <Container>
-      <PetShop width="100%" height="160" />
+    return (
+        <Container>
+            <Logo width="100%" height="160" />
+            <InputArea>
+                <SignInput 
+                    Icone={EmailIcon}
+                    placeholder="Digite seu e-mail"
+                    value={emailField}
+                    onChangeText={t=>setEmailField(t)}
+                     />
+                <SignInput 
+                    Icone={LockIcon}
+                    placeholder="Digite sua senha"
+                    value={passwordField}
+                    onChangeText={t=>setPasswordField(t)}
+                    pass={true}
+                    />
+                <LoginButton onPress={handleSignClick}>
+                    <LoginButtonText>LOGIN</LoginButtonText>
+                </LoginButton>
+            </InputArea>
 
-      <InputArea>
-        <SignInput
-          IconSvg={EmailIcon}
-          placeholder="Digite seu e-mail"
-          value={emailField}
-          onChangeText={(text) => setEmailField(text)}
-        />
-
-        <SignInput
-          IconSvg={LockIcon}
-          placeholder="Digite sua senha"
-          email={passwordField}
-          onChangeText={(text) => setPasswordField(text)}
-          password={true}
-        />
-
-        <CustomButton onPress={handleSignClick}>
-          <CustomButtomText>LOGIN</CustomButtomText>
-        </CustomButton>
-      </InputArea>
-
-      <SignMessageButton onPress={handleMessageButtonClick}>
-        <SignMessageButtonText>
-          Ainda não possui uma conta?
-        </SignMessageButtonText>
-        <SignMessageButtonTextBold> Cadastre-se</SignMessageButtonTextBold>
-      </SignMessageButton>
-    </Container>
-  );
-};
+            <SignMessageButton onPress={handleMessageButtonClick} >
+                <SignMessageButtonText>Ainda não possui uma conta?</SignMessageButtonText>
+                <SignMessageButtonTextBold>Cadastre-se</SignMessageButtonTextBold>
+            </SignMessageButton>
+            
+        </Container>
+    );
+}

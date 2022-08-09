@@ -1,48 +1,55 @@
-import React, {useContext, useEffect} from 'react';
-import {Container, LoadingIcon} from './styles';
+import React, { useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
-import {UserContext} from '../../contexts/UserContext';
+import Api from '../../Api';
 
-import Api from '../../api';
+import Logo from '../../assets/house-pet.svg'
 
-import PetShop from '../../assets/house-pet.svg';
+import { Container, LoadingIcon } from './style';
+import { UserContext } from '../../contexts/UserContext';
 
 export default () => {
-  const {dispatch: userDispatch} = useContext(UserContext);
-  const navigation = useNavigation();
+    const navigation = useNavigation();
 
-  useEffect(() => {
-    const checkToken = async () => {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        let res = await Api.checkToken(token);
-        if (token) {
-          await AsyncStorage.setItem('token', res.token);
+    const { dispatch: userDispatch } = useContext(UserContext);
 
-          userDispatch({
-            type: 'setAvatar',
-            payload: {
-              avatar: res.data.avatar,
-            },
-          });
-
-          navigation.reset({
-            routes: [{name: 'MainTab'}],
-          });
-        }
-      } else {
-        navigation.navigate('SignIn');
-      }
-    };
-    checkToken();
-  }, []);
-
-  return (
-    <Container>
-      <PetShop width="100%" height="160" />
-      <LoadingIcon size="large" color="#ffffff" />
-    </Container>
-  );
-};
+    useEffect(() => {
+        const checkToken = async () => {
+          const token = await AsyncStorage.getItem('token');
+          if (token) {
+            let res = await Api.checkToken(token);
+            if (res.token) {
+              await AsyncStorage.setItem('token', res.token);
+              userDispatch({
+                type: 'setAvatar',
+                payload: {
+                  name: res.data.name,
+                  avatar: res.data.avatar,
+                  email: res.data.email
+                },
+              });
+              navigation.reset({
+                routes: [
+                  {
+                    name: 'MainTab',
+                  },
+                ],
+              });
+            } else {
+              navigation.navigate('SignIn');
+            }
+          } else {
+            navigation.navigate('SignIn');
+          }
+        };
+        checkToken()
+      }, []);
+    
+    return (
+        <Container>
+            <Logo width="100%" height="160" />
+            <LoadingIcon size='large' color='#FFFFFF'/>
+        </Container>
+    )
+}

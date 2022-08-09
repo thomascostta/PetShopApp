@@ -1,94 +1,88 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import Swiper from 'react-native-swiper';
 
+import {
+  Container,
+  Scroller,
+  PageBody,
+  BackButton,
+  LoadingIcon,
+  FakeSwiper,
+  SwipeDot,
+  SwipeDotActive,
+  SwipeImage,
+  SwipeItem,
+  UserInfoArea,
+  UserInfoName,
+  UserInfo,
+  UserFavButton,
+  UserAvatar,
+  ServiceItem,
+  ServiceInfo,
+  ServiceName,
+  ServicePrice,
+  ServiceArea,
+  ServiceChooseButton,
+  ServiceChooseButtonText,
+  ServiceTitle,
+  TestimonialArea,
+  TestimonialInfo,
+  TestimonialItem,
+  TestimonialName,
+  TestimonialBody,
+} from './style';
+
+import Api from '../../Api';
+import Swiper from 'react-native-swiper';
+import {petPictures} from '../../data/petPictures';
 import Stars from '../../components/Stars';
-import BarberModal from '../../components/BarberModal';
 
 import FavoriteFullIcon from '../../assets/favorite_full.svg';
 import FavoriteIcon from '../../assets/favorite.svg';
 import BackIcon from '../../assets/back.svg';
 import NavPrevIcon from '../../assets/nav_prev.svg';
 import NavNextIcon from '../../assets/nav_next.svg';
-
-import {
-  SwipeDot,
-  UserInfo,
-  Scroller,
-  PageBody,
-  Container,
-  UserAvatar,
-  BackButton,
-  SwiperItem,
-  LoadingIcon,
-  ServiceItem,
-  ServiceName,
-  ServiceInfo,
-  ServiceArea,
-  SwiperImage,
-  UserInfoArea,
-  ServicePrice,
-  UserInfoName,
-  UserFavButton,
-  ServicesTitle,
-  SwipeDotActive,
-  TestimonialArea,
-  TestimonialItem,
-  TestimonialInfo,
-  TestimonialName,
-  TestimonialBody,
-  ServiceChooseButton,
-  ServiceChooseBtnText,
-} from './styles';
-
-import Api from '../../api';
-import {petPictures} from '../../data/petPictures';
-import api from '../../api';
+import BarberModal from '../../components/BarberModal';
 
 export default () => {
   const navigation = useNavigation();
   const route = useRoute();
 
+  const [selectedService, setSelectedService] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [favorited, setFavorited] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState({
     id: route.params.id,
     avatar: route.params.avatar,
     name: route.params.name,
     stars: route.params.stars,
   });
-  const [loading, setLoading] = useState(false);
-  const [favorited, setFavorited] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const getBarberInfo = async () => {
-      setLoading(true);
-
-      let json = await Api.getBarber(userInfo.id);
-
-      if (json.error === '') {
-        setUserInfo(json.data);
-        setFavorited(json.data.favorited);
+      let res = await Api.getBarber(userInfo.id);
+      if (res.error == '') {
+        setUserInfo(res.data);
+        setFavorited(res.data.favorited);
       } else {
-        alert('Erro: ' + json.error);
+        alert('Oops: ' + res.error);
       }
-
-      setLoading(false);
     };
     getBarberInfo();
   }, []);
+
+  const handleFavClick = () => {
+    setFavorited(!favorited);
+    Api.setFavorite(userInfo.id);
+  };
 
   const handleBackButton = () => {
     navigation.goBack();
   };
 
-  const handleFavoriteClick = () => {
-    setFavorited(!favorited);
-    api.setFavorite(userInfo.id);
-  };
-
-  const handleServiceChoose = (index) => {
-    setSelectedService(index);
+  const handleServiceChoose = (key) => {
+    setSelectedService(key);
     setShowModal(true);
   };
 
@@ -107,75 +101,76 @@ export default () => {
           }}
           autoplay={true}>
           {petPictures.map((item, index) => (
-            <SwiperItem key={index}>
-              <SwiperImage source={item.image} resizeMode="cover" />
-            </SwiperItem>
+            <SwipeItem key={index}>
+              <SwipeImage source={item.image} resizeMode="cover" />
+            </SwipeItem>
           ))}
         </Swiper>
+
         <PageBody>
           <UserInfoArea>
             <UserAvatar source={{uri: userInfo.avatar}} />
             <UserInfo>
               <UserInfoName>{userInfo.name}</UserInfoName>
-              <Stars stars={userInfo.stars} showNumber={true} />
+              <Stars note={userInfo.stars} showN />
             </UserInfo>
-            <UserFavButton onPress={handleFavoriteClick}>
+            <UserFavButton onPress={handleFavClick}>
               {favorited ? (
-                <FavoriteFullIcon width="24" height="24" fill="#ff0000" />
+                <FavoriteFullIcon width="24" height="24" fill="#FF0000" />
               ) : (
-                <FavoriteIcon width="24" height="24" fill="#ff0000" />
+                <FavoriteIcon width="24" height="24" fill="#FF0000" />
               )}
             </UserFavButton>
           </UserInfoArea>
-
           {loading && <LoadingIcon size="large" color="#000000" />}
-          {userInfo.services && (
-            <ServiceArea>
-              <ServicesTitle>Lista de serviços</ServicesTitle>
-              {userInfo.services.map((item, index) => (
-                <ServiceItem key={index}>
+          <ServiceArea>
+            <ServiceTitle>Lista de serviços</ServiceTitle>
+            {userInfo.services ? (
+              userInfo.services.map((item, key) => (
+                <ServiceItem key={key}>
                   <ServiceInfo>
                     <ServiceName>{item.name}</ServiceName>
-                    <ServicePrice>R$ {item.price}</ServicePrice>
+                    <ServicePrice>
+                      R$ {item.price.toFixed(2).replace('.', ',')}
+                    </ServicePrice>
                   </ServiceInfo>
-                  <ServiceChooseButton
-                    onPress={() => handleServiceChoose(index)}>
-                    <ServiceChooseBtnText>Agendar</ServiceChooseBtnText>
+                  <ServiceChooseButton onPress={() => handleServiceChoose(key)}>
+                    <ServiceChooseButtonText>Agendar</ServiceChooseButtonText>
                   </ServiceChooseButton>
                 </ServiceItem>
-              ))}
-            </ServiceArea>
-          )}
-
-          {/* Waiting for backend regularization */}
-          {/* {userInfo && userInfo.testimonials.length > 0 && (
+              ))
+            ) : (
+              <LoadingIcon size="large" color="#000000" />
+            )}
+          </ServiceArea>
+          {userInfo.testimonials && userInfo.testimonials.length > 0 && (
             <TestimonialArea>
               <Swiper
                 style={{height: 110}}
                 showsPagination={false}
-                showsButtons
+                showsButtons={true}
                 prevButton={
                   <NavPrevIcon width="35" height="35" fill="#000000" />
                 }
                 nextButton={
                   <NavNextIcon width="35" height="35" fill="#000000" />
                 }>
-                {userInfo.testimonials.map((item, index) => (
-                  <TestimonialItem key={index}>
+                {userInfo.testimonials.map((item, key) => (
+                  <TestimonialItem key={key}>
                     <TestimonialInfo>
                       <TestimonialName>{item.name}</TestimonialName>
-                      <Stars stars={item.rate} showNumber={false} />
+                      <Stars note={item.rate} showN={false} />
                     </TestimonialInfo>
                     <TestimonialBody>{item.body}</TestimonialBody>
                   </TestimonialItem>
                 ))}
               </Swiper>
             </TestimonialArea>
-          )}  */}
+          )}
         </PageBody>
       </Scroller>
       <BackButton onPress={handleBackButton}>
-        <BackIcon width="44" height="44" fill="#ffffff" />
+        <BackIcon width="44" height="44" fill="#FFFFFF" />
       </BackButton>
 
       <BarberModal
